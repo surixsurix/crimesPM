@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Funcionários</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #searchBar {
+      display: block;
+      margin: 20px auto;
+      padding: 10px;
+      width: 50%;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: #fff;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th, td {
+      padding: 12px;
+    }
+
+    #addEmployee {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 15px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    #totalEmployees {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+    }
+
+    #formContainer {
+      display: none;
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #444;
+      border-radius: 10px;
+      box-shadow: 0px 5px 10px rgba(0,0,0,0.3);
+    }
+
+    #formContainer input {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 95%;
+    }
+
+    #formContainer button {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gerenciamento de Funcionários</h1>
+
+  <input type="text" id="searchBar" placeholder="Pesquisar por Nome ou ID...">
+
+  <table id="employeeTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Cargo</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <button id="addEmployee">+ Cadastrar Funcionário</button>
+  <div id="totalEmployees">Total: 0</div>
+
+  <div id="formContainer">
+    <h3>Novo Funcionário</h3>
+    <input type="text" id="idInput" placeholder="ID">
+    <input type="text" id="nameInput" placeholder="Nome">
+    <input type="text" id="roleInput" placeholder="Cargo">
+    <button onclick="saveEmployee()">Salvar</button>
+    <button onclick="closeForm()">Cancelar</button>
+  </div>
+
+  <script>
+    let employees = JSON.parse(localStorage.getItem("employees")) || [];
+
+    const tableBody = document.querySelector("#employeeTable tbody");
+    const totalEmployees = document.getElementById("totalEmployees");
+
+    function renderEmployees(filter = "") {
+      tableBody.innerHTML = "";
+      let filtered = employees.filter(emp =>
+        emp.name.toLowerCase().includes(filter.toLowerCase()) ||
+        emp.id.toLowerCase().includes(filter.toLowerCase())
+      );
+      filtered.forEach(emp => {
+        let row = `<tr><td>${emp.id}</td><td>${emp.name}</td><td>${emp.role}</td></tr>`;
+        tableBody.innerHTML += row;
+      });
+      totalEmployees.innerText = "Total: " + employees.length;
+    }
+
+    document.getElementById("searchBar").addEventListener("input", (e) => {
+      renderEmployees(e.target.value);
+    });
+
+    document.getElementById("addEmployee").addEventListener("click", () => {
+      document.getElementById("formContainer").style.display = "block";
+    });
+
+    function saveEmployee() {
+      let id = document.getElementById("idInput").value;
+      let name = document.getElementById("nameInput").value;
+      let role = document.getElementById("roleInput").value;
+
+      if (id && name && role) {
+        employees.push({ id, name, role });
+        localStorage.setItem("employees", JSON.stringify(employees));
+        renderEmployees();
+        closeForm();
+      } else {
+        alert("Preencha todos os campos!");
+      }
+    }
+
+    function closeForm() {
+      document.getElementById("formContainer").style.display = "none";
+      document.getElementById("idInput").value = "";
+      document.getElementById("nameInput").value = "";
+      document.getElementById("roleInput").value = "";
+    }
+
+    renderEmployees();
+  </script>
+</body>
+</html>
