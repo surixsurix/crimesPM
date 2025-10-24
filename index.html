@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tabela de Crimes e Comandos</title>
+    <link rel="icon" type="image/gif" href="https://wiki.habborp.city/lib/exe/fetch.php?media=nypd.gif">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +24,11 @@
             padding: 25px;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Classe para esconder o conteúdo na janela principal quando o PiP estiver ativo */
+        .container.hidden-in-main {
+            display: none !important;
         }
 
         h1 {
@@ -71,6 +77,18 @@
             white-space: nowrap;
         }
 
+        .pip-button {
+            background-color: #007bff; /* Azul para o PiP */
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+            transition: transform 0.1s ease-out;
+        }
+
         .copy-button {
             background-color: #4CAF50;
             color: white;
@@ -87,176 +105,144 @@
         }
         
         .copy-button:active {
-            transform: scale(0.98);
+            transform: scale(0.90); /* Animação ao clicar: fica menor */
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+        .pip-button:active {
+            transform: scale(0.95);
         }
 
         /* Feedback visual para cópia */
-        .copy-feedback {
+        #copyFeedback {
             position: fixed;
-            bottom: 20px;
+            bottom: -60px; /* Escondido */
             right: 20px;
             background-color: #333;
             color: white;
             padding: 10px 15px;
             border-radius: 5px;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: all 0.5s ease;
             pointer-events: none;
+            z-index: 1000;
         }
 
-        .copy-feedback.show {
+        #copyFeedback.show {
+            bottom: 20px;
             opacity: 1;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Crimes e Comandos de Punição</h1>
+    <div class="container" id="mainContainer">
         
-        <section id="agressao-civil">
-            <h2>Agressão a um Civil</h2>
-            <ul class="crime-list">
-                <li class="crime-item">
-                    <span class="crime-name">Roubar um Civil</span>
-                    <span class="crime-command" data-command=":c x 1">:c x 1</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Conspiração de Crime</span>
-                    <span class="crime-command" data-command=":c x 2">:c x 2</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Atirar num Civil</span>
-                    <span class="crime-command" data-command=":c x 3">:c x 3</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Abuso Verbal</span>
-                    <span class="crime-command" data-command=":c x 4">:c x 4</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Matar um Civil</span>
-                    <span class="crime-command" data-command=":c x 7">:c x 7</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Apologia ao Crime</span>
-                    <span class="crime-command" data-command=":c x 8">:c x 8</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Assédio</span>
-                    <span class="crime-command" data-command=":c x 10">:c x 10</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-            </ul>
-        </section>
+        <div style="display: flex; justify-content: flex-end; width: 100%; margin-bottom: 10px;">
+            <button class="pip-button" id="pipButton">PiP Externo 🖼️</button>
+        </div>
+        
+        <div id="contentToMove">
+            <h1>Crimes e Comandos de Punição</h1>
+            
+            <section id="agressao-civil">
+                <h2>Agressão a um Civil</h2>
+                <ul class="crime-list">
+                    <li class="crime-item">
+                        <span class="crime-name">Roubar um Civil</span>
+                        <span class="crime-command" data-command=":c x 1">:c x 1</span>
+                        <button class="copy-button" data-command=":c x 1">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Conspiração de Crime</span>
+                        <span class="crime-command" data-command=":c x 2">:c x 2</span>
+                        <button class="copy-button" data-command=":c x 2">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Atirar num Civil</span>
+                        <span class="crime-command" data-command=":c x 3">:c x 3</span>
+                        <button class="copy-button" data-command=":c x 3">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Abuso Verbal</span>
+                        <span class="crime-command" data-command=":c x 4">:c x 4</span>
+                        <button class="copy-button" data-command=":c x 4">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Matar um Civil</span>
+                        <span class="crime-command" data-command=":c x 7">:c x 7</span>
+                        <button class="copy-button" data-command=":c x 7">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Apologia ao Crime</span>
+                        <span class="crime-command" data-command=":c x 8">:c x 8</span>
+                        <button class="copy-button" data-command=":c x 8">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Assédio</span>
+                        <span class="crime-command" data-command=":c x 10">:c x 10</span>
+                        <button class="copy-button" data-command=":c x 10">📋</button>
+                    </li>
+                </ul>
+            </section>
 
-        <section id="agressao-pm">
-            <h2>Agressão a um PM</h2>
-            <ul class="crime-list">
-                <li class="crime-item">
-                    <span class="crime-name">Atirar</span>
-                    <span class="crime-command" data-command=":c x 20">:c x 20</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Matar</span>
-                    <span class="crime-command" data-command=":c x 24">:c x 24</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Desacato</span>
-                    <span class="crime-command" data-command=":c x 19">:c x 19</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Roubar</span>
-                    <span class="crime-command" data-command=":c x 21">:c x 21</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Trote</span>
-                    <span class="crime-command" data-command=":c x 29">:c x 29</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-            </ul>
-        </section>
+            <section id="agressao-pm">
+                <h2>Agressão a um PM</h2>
+                <ul class="crime-list">
+                    <li class="crime-item">
+                        <span class="crime-name">Atirar</span>
+                        <span class="crime-command" data-command=":c x 20">:c x 20</span>
+                        <button class="copy-button" data-command=":c x 20">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Matar</span>
+                        <span class="crime-command" data-command=":c x 24">:c x 24</span>
+                        <button class="copy-button" data-command=":c x 24">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Desacato</span>
+                        <span class="crime-command" data-command=":c x 19">:c x 19</span>
+                        <button class="copy-button" data-command=":c x 19">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Roubar</span>
+                        <span class="crime-command" data-command=":c x 21">:c x 21</span>
+                        <button class="copy-button" data-command=":c x 21">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Trote</span>
+                        <span class="crime-command" data-command=":c x 29">:c x 29</span>
+                        <button class="copy-button" data-command=":c x 29">📋</button>
+                    </li>
+                </ul>
+            </section>
 
-        <section id="invasao">
-            <h2>Invasão</h2>
-            <ul class="crime-list">
-                <li class="crime-item">
-                    <span class="crime-name">Invasão de Área Policial</span>
-                    <span class="crime-command" data-command=":c x 33">:c x 33</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-                <li class="crime-item">
-                    <span class="crime-name">Invasão de Corporação</span>
-                    <span class="crime-command" data-command=":c x 34">:c x 34</span>
-                    <button class="copy-button" onclick="copyCommand(this)">📋</button>
-                </li>
-            </ul>
-        </section>
+            <section id="invasao">
+                <h2>Invasão</h2>
+                <ul class="crime-list">
+                    <li class="crime-item">
+                        <span class="crime-name">Invasão de Área Policial</span>
+                        <span class="crime-command" data-command=":c x 33">:c x 33</span>
+                        <button class="copy-button" data-command=":c x 33">📋</button>
+                    </li>
+                    <li class="crime-item">
+                        <span class="crime-name">Invasão de Corporação</span>
+                        <span class="crime-command" data-command=":c x 34">:c x 34</span>
+                        <button class="copy-button" data-command=":c x 34">📋</button>
+                    </li>
+                </ul>
+            </section>
+        </div>
     </div>
 
     <div id="copyFeedback" class="copy-feedback">Comando copiado!</div>
 
     <script>
-        function copyCommand(button) {
-            // Encontra o elemento do comando (irmão anterior que tem a classe .crime-command)
-            const commandElement = button.previousElementSibling;
-            
-            // O comando está no atributo data-command
-            const commandText = commandElement.getAttribute('data-command');
+        let pipWindow = null;
+        const mainContainer = document.getElementById('mainContainer');
+        const contentToMove = document.getElementById('contentToMove');
+        const pipButton = document.getElementById('pipButton');
 
-            // Tenta usar a API Clipboard (moderna)
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(commandText)
-                    .then(() => showFeedback())
-                    .catch(err => {
-                        // Fallback em caso de erro (ex: permissões negadas)
-                        console.error('Erro ao copiar com clipboard.writeText:', err);
-                        fallbackCopyTextToClipboard(commandText);
-                    });
-            } else {
-                // Fallback para navegadores mais antigos
-                fallbackCopyTextToClipboard(commandText);
-            }
-        }
-
-        // Função de fallback para copiar usando execCommand
-        function fallbackCopyTextToClipboard(text) {
-            const textArea = document.createElement("textarea");
-            textArea.value = text;
-            
-            // Estilização para fora da tela
-            textArea.style.position = "fixed";
-            textArea.style.left = "-9999px";
-            textArea.style.top = "-9999px";
-            
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-
-            try {
-                const successful = document.execCommand('copy');
-                if (successful) {
-                    showFeedback();
-                } else {
-                    alert("Erro ao copiar. Tente selecionar o comando manualmente.");
-                }
-            } catch (err) {
-                console.error('Fallback: Erro ao copiar comando:', err);
-                alert("Erro ao copiar. Tente selecionar o comando manualmente.");
-            }
-
-            document.body.removeChild(textArea);
-        }
-
+        // Função para mostrar o feedback de cópia
         function showFeedback() {
             const feedback = document.getElementById('copyFeedback');
             feedback.classList.add('show');
@@ -264,6 +250,136 @@
                 feedback.classList.remove('show');
             }, 1500);
         }
+
+        // Função de cópia para a área de transferência
+        function copyCommand(button, doc) {
+            const commandText = button.getAttribute('data-command');
+            const win = doc.defaultView || window;
+            const clipboard = win.navigator && win.navigator.clipboard;
+
+            function fallbackCopyTextToClipboard(text, docLocal) {
+                const textArea = docLocal.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                textArea.style.top = "-9999px";
+                
+                docLocal.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = docLocal.execCommand('copy');
+                    if (successful) showFeedback();
+                    else alert("Erro ao copiar.");
+                } catch (err) {
+                    alert("Erro ao copiar. Tente selecionar o comando manualmente.");
+                }
+                docLocal.body.removeChild(textArea);
+            }
+
+            if (clipboard && typeof clipboard.writeText === 'function') {
+                clipboard.writeText(commandText)
+                    .then(() => showFeedback())
+                    .catch(() => fallbackCopyTextToClipboard(commandText, doc));
+            } else {
+                fallbackCopyTextToClipboard(commandText, doc);
+            }
+        }
+
+        // Adiciona/Re-adiciona os event listeners de cópia ao DOM (principal ou PiP)
+        function rebindCopyEvents(doc) {
+            const copyButtons = doc.querySelectorAll('.copy-button');
+            copyButtons.forEach(button => {
+                // Remove listeners antigos para evitar duplicação no rebind
+                button.onclick = null; 
+                button.onclick = (e) => {
+                    // Passa o botão clicado e o documento de onde o clique veio
+                    copyCommand(button, doc);
+                    e.stopPropagation(); 
+                };
+            });
+        }
+        
+        // --- Lógica PiP ---
+
+        async function openPiP() {
+            if (!('documentPictureInPicture' in window)) {
+                alert("Seu navegador não suporta a API Document Picture-in-Picture.");
+                return;
+            }
+            
+            // 1. Abre a nova janela PiP
+            try {
+                pipWindow = await documentPictureInPicture.requestWindow({ width: 520, height: 600 });
+            } catch (e) {
+                console.error("Erro ao abrir a janela PiP:", e);
+                return;
+            }
+
+            // 2. Prepara o conteúdo e os estilos
+            
+            // Move o conteúdo principal para a nova janela (nó real)
+            pipWindow.document.body.appendChild(contentToMove);
+
+            // Copia os estilos
+            const style = document.createElement('style');
+            style.textContent = document.querySelector('style').textContent;
+            pipWindow.document.head.appendChild(style);
+            
+            // **Adiciona o favicon na janela PiP**
+            const favicon = document.createElement('link');
+            favicon.rel = 'icon';
+            favicon.type = 'image/gif';
+            favicon.href = 'https://wiki.habborp.city/lib/exe/fetch.php?media=nypd.gif';
+            pipWindow.document.head.appendChild(favicon);
+
+            // 3. Atualiza o estado visual
+            mainContainer.classList.add('hidden-in-main');
+            pipButton.textContent = "Voltar para Aba ↩️";
+            
+            // 4. Re-adiciona os eventos no contexto PiP
+            rebindCopyEvents(pipWindow.document);
+
+            // 5. Configura o evento de fechamento
+            pipWindow.addEventListener('pagehide', closePiP);
+        }
+
+        function closePiP() {
+            if (!pipWindow) return;
+            
+            // 1. Move o conteúdo de volta para a janela principal
+            if (pipWindow.document.getElementById('contentToMove')) {
+                 document.getElementById('mainContainer').appendChild(pipWindow.document.getElementById('contentToMove'));
+            }
+
+            // 2. Atualiza o estado visual
+            mainContainer.classList.remove('hidden-in-main');
+            pipButton.textContent = "PiP Externo 🖼️";
+
+            // 3. Fecha a janela PiP (se ainda não estiver fechada) e limpa a referência
+            if (!pipWindow.closed) {
+                pipWindow.close();
+            }
+            pipWindow = null;
+            
+            // 4. Re-adiciona os eventos no contexto principal
+            rebindCopyEvents(document);
+        }
+
+        function togglePiP() {
+            if (pipWindow) {
+                closePiP();
+            } else {
+                openPiP();
+            }
+        }
+
+        // Inicialização
+        pipButton.onclick = togglePiP;
+        // Bind inicial dos botões no documento principal
+        rebindCopyEvents(document); 
+
     </script>
 
 </body>
